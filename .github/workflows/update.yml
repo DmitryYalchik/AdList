@@ -1,0 +1,23 @@
+name: Update filter list
+on:
+  schedule:
+    - cron: "0 6 * * *"   # каждый день
+  workflow_dispatch:       # кнопка ручного запуска
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download fresh list
+        run: curl -fsSL "https://easylist-downloads.adblockplus.org/ruadlist%2Beasylist.txt" -o ruadlist.txt
+      - name: Commit if changed
+        run: |
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
+          git add ruadlist.txt
+          git diff --cached --quiet || git commit -m "Update filter list"
+          git push
